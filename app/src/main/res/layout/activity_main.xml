@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context="com.example.lsnoussi.traitement_images.MainActivity">
+
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="match_parent"
+        android:layout_height="309dp"
+        android:scaleType="fitStart"
+        app:srcCompat="@drawable/test"
+        tools:layout_editor_absoluteX="0dp"
+        tools:layout_editor_absoluteY="-48dp" />
+
+    <ScrollView
+        style="@android:style/Widget.DeviceDefault.Light.ScrollView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:scrollbarStyle="insideOverlay"
+        tools:layout_editor_absoluteX="3dp"
+        tools:layout_editor_absoluteY="401dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <Button
+                android:id="@+id/reset"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="reset" />
+
+            <Button
+                android:id="@+id/griser"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="griser" />
+
+            <Button
+                android:id="@+id/coloriser"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="coloriser" />
+
+            <Button
+                android:id="@+id/dynamic_extension"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="extention_dynamique" />
+
+            <Button
+                android:id="@+id/histo_gray"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Egalisation histogramme_gray" />
+
+            <Button
+                android:id="@+id/histo_rgb"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Egalisation histogramme_rgb" />
+
+            <Button
+                android:id="@+id/moyenneur"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="moyenneur" />
+
+            <Button
+                android:id="@+id/filtre_gauss"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="filtre_gaussien" />
+        </LinearLayout>
+
+
+    </ScrollView>
+
+
+</LinearLayout>
