@@ -51,10 +51,6 @@ public class MainActivity extends AppCompatActivity {
             int mean = (int) (0.3*r+ 0.59*g+ b*0.11);
             pixels[i] = Color.rgb(mean,mean,mean);
         }
-        for(int i =0 ; i < 256; i++) {
-            int m = (255*(i-min))/(max-min);
-            pixels[i] = Color.rgb(m,m,m);
-        }
         bmp.setPixels(pixels,0,bmp.getWidth(), 0,0 ,bmp.getWidth(),bmp.getHeight());
     }
 
@@ -230,7 +226,7 @@ public class MainActivity extends AppCompatActivity {
      /**
      *  @param bmp
      * take a bitmap as a parameter.
-     *  function that forces the levels of g to be organized between 0 and 255 */
+     *  function that forces the levels of gray to be organized between 0 and 255 */
 
     public void histogramEqualization_gray(Bitmap bmp) {
 
