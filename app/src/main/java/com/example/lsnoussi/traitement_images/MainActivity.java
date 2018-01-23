@@ -24,7 +24,8 @@ public class MainActivity extends AppCompatActivity {
     private Button histo_rgbButton ;
     private Button flouButton ;
     private Button resetButton ;
-     private Button gaussButton ;
+    private Button gaussButton ;
+    private Button over_exposureButton;
     private Bitmap bmp;
     private ImageView img;
 
@@ -173,7 +174,7 @@ public class MainActivity extends AppCompatActivity {
         for (int i = 0; i < hist.length; ++i) {
             if (hist[i] > maxH) {
                 max = i;
-            } else if (hist[i] <= minH) {
+            } else if (hist[i] < minH) {
                 min = i;
             }
         }
@@ -222,7 +223,68 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    public Bitmap dynamic_extention1(Bitmap bmp) {
+        toGray(bmp);
+        int w = bmp.getWidth();
+        int h = bmp.getHeight();
 
+        int[] pixels = new int[h * w];
+
+
+        bmp.getPixels(pixels, 0, w, 0, 0, w, h);
+        Bitmap last = Bitmap.createBitmap(bmp.getWidth(), bmp.getHeight(), bmp.getConfig());
+        int r_max = 0 ;
+        int g_max = 0;
+        int b_max = 0 ;
+
+        int r_min = 0 ;
+        int g_min = 0;
+        int b_min = 0 ;
+
+        int R0 = Color.red(pixels[0]);
+        int G0 = Color.green(pixels[0]);
+        int B0 = Color.blue(pixels[0]);
+
+        for (int i = 0; i < pixels.length; ++i) {
+            if (Color.red(pixels[i])> R0) {
+                r_max= Color.red(pixels[i]);
+            } else if ( Color.red(pixels[i]) < R0) {
+                r_min = Color.red(pixels[i]);
+            }
+
+
+            if (Color.green(pixels[i])> G0) {
+                g_max= Color.green(pixels[i]);
+            } else if ( Color.green(pixels[i]) < G0) {
+                g_min = Color.green(pixels[i]);
+            }
+
+
+            if (Color.blue(pixels[i])> B0) {
+                b_max= Color.blue(pixels[i]);
+            } else if ( Color.blue(pixels[i]) < B0) {
+                b_min = Color.blue(pixels[i]);
+            }
+
+        }
+        // Applies linear extension of dynamics to the bitmap
+
+        for (int i = 0; i < pixels.length; ++i) {
+            int R = 255 * ((Color.red(pixels[i])) - r_min) / (r_max - r_min);
+            int G = 255 * ((Color.green(pixels[i])) - g_min) / (g_max - g_min);
+            int B = 255 * ((Color.blue(pixels[i])) - b_min) / (b_max - b_min);
+            pixels[i] = Color.rgb(R, G, B);
+        }
+
+        last.setPixels(pixels, 0, w, 0, 0, w, h);
+        System.out.println("minRED" + r_min  + ", maxRED" + r_max );
+        System.out.println("minBlue" + b_min  + ", maxblue" + b_max );
+        System.out.println("mingreen" + g_min  + ", maxgreen" + g_max );
+        return last ;
+
+
+
+    }
      /**
      *  @param bmp
      * take a bitmap as a parameter.
@@ -238,6 +300,8 @@ public class MainActivity extends AppCompatActivity {
         int[] pixels = new int[h * w];
 
         int[] hist = histogram(bmp);
+
+
         int[] C = new int[hist.length];
         C[0] = hist[0];
         for (int i = 1; i < hist.length; ++i) {
@@ -274,6 +338,7 @@ public class MainActivity extends AppCompatActivity {
 
 
     public void histogramEqualization_RGB(Bitmap bmp) {
+
         int w = bmp.getWidth();
         int h = bmp.getHeight();
 
@@ -304,6 +369,69 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    /**
+     *
+     * @param bmp
+     * take a bitmap as a parameter.
+     * function that brighten a picture using an histogram for every R,G,B
+     */
+
+    void over_exposure(Bitmap bmp) {
+
+        int w = bmp.getWidth();
+        int h = bmp.getHeight();
+
+        int[] pixels = new int[h * w];
+
+
+        int[] hist_red = new int[256];
+        int[] hist_green = new int[256];
+        int[] hist_blue = new int[256];
+        bmp.getPixels(pixels, 0, w, 0, 0, w, h);
+        int coeff = 10;
+
+        for (int i = 0; i < pixels.length; ++i) {
+            hist_red[(Color.red(pixels[i]) * 255 - coeff )/ 255] += 1;
+            hist_green[(Color.green(pixels[i]) * 255 - coeff )/ 255] += 1;
+            hist_blue[(Color.blue(pixels[i]) * 255 - coeff) / 255] += 1;
+         }
+
+        int[] C_red = new int[hist_red.length];
+        int[] C_green = new int[hist_green.length];
+        int[] C_blue = new int[hist_blue.length];
+
+
+        C_red[0] = hist_red[0];
+        C_green[0] = hist_green[0];
+        C_blue[0] = hist_blue[0];
+
+
+        for (int i = 1; i < hist_red.length; ++i) {
+            C_red[i] = C_red[i - 1] + hist_red[i];
+            C_green[i] = C_green[i - 1] + hist_green[i];
+            C_blue[i] = C_blue[i - 1] + hist_blue[i];
+        }
+
+
+
+
+        //equalization:
+       
+        for (int i = 0; i < pixels.length; ++i) {
+            int R = Color.red(pixels[i]);
+            R = C_red[R] * 255 / pixels.length;
+            int G = Color.green(pixels[i]);
+            G = C_green[G] * 255 / pixels.length;
+            int B = Color.blue(pixels[i]);
+            B = C_blue[B] * 255 / pixels.length;
+
+            pixels[i] = Color.rgb(R, G, B);
+        }
+
+        bmp.setPixels(pixels, 0, w, 0, 0, w, h);
+
+
+    }
 
 
     /*    III- Convolution :   */
@@ -497,10 +625,15 @@ public class MainActivity extends AppCompatActivity {
     private View.OnClickListener dynamic_extentionButtonlistner = new View.OnClickListener() {
 
         public void onClick(View v) {
-            dynamic_extention(b);
+            dynamic_extention1(b);
         }
     };
+    private View.OnClickListener over_exposureButtonlistener = new View.OnClickListener() {
 
+        public void onClick(View v) {
+            over_exposure(b);
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -536,6 +669,9 @@ public class MainActivity extends AppCompatActivity {
 
         dynamic_extensionButton = (Button) findViewById(R.id.dynamic_extension);
         dynamic_extensionButton.setOnClickListener(dynamic_extentionButtonlistner);
+
+        over_exposureButton = (Button) findViewById(R.id.surexposition);
+        over_exposureButton.setOnClickListener(over_exposureButtonlistener);
 
         resetButton = (Button) findViewById(R.id.reset);
         resetButton.setOnClickListener(new View.OnClickListener() {
